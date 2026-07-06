@@ -79,9 +79,9 @@ def transition(youtube, broadcast_id, status):
     ).execute()
 
 
-def save_state(broadcast_id, stream_id):
+def save_state(broadcast_id, stream_id, session):
     with open(STATE_PATH, "w", encoding="utf-8") as f:
-        json.dump({"broadcast_id": broadcast_id, "stream_id": stream_id}, f)
+        json.dump({"broadcast_id": broadcast_id, "stream_id": stream_id, "session": session}, f)
 
 
 def load_state():
