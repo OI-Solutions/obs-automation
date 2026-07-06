@@ -111,7 +111,14 @@ note under Troubleshooting.
 - `current_broadcast.json` — transient state file linking a `start` call to its `stop` call (holds the in-progress broadcast ID, YouTube stream ID, and which session number is live). Should not exist between sessions; if it does and `reconcile.py`/scheduled tasks aren't running, something didn't shut down cleanly (see Troubleshooting). Not tracked in git.
 - `reconcile.lock` — transient lock file held only for the duration of a single `reconcile()` run; should not persist between runs. Not tracked in git.
 - `register_tasks.ps1` — (re)registers all 6 recurring scheduled tasks (5 Friday fixed-time + 1 AtLogOn). Safe to re-run any time; it unregisters and recreates each task.
+- `dismiss_obs_crash_dialog.ps1` — dismisses OBS's "Crash Detected" recovery dialog without a mouse, if OBS was ever force-killed instead of gracefully closed. See Troubleshooting.
 - `logs\stream.log` — append-only log of every start/stop/reconcile action, one line per event with a timestamp.
+
+A full backup of `%APPDATA%\obs-studio` (OBS's scenes/profile/plugin
+config, taken before installing Aitum Multistream) lives outside this repo
+at `C:\Users\AIF\OBS-Backups\obs-studio-config_2026-07-06_024311.zip`. To
+restore: close OBS, extract the zip's contents into `%APPDATA%\obs-studio`
+(overwrite), reopen OBS.
 
 ## Google Cloud / YouTube API setup (for reference, already done)
 
@@ -195,6 +202,20 @@ close together — just wait). Older than that, it's a leftover from a run
 that got killed (e.g. by the task's 10-minute `ExecutionTimeLimit`) before
 it could clean up; the next `reconcile()` run reclaims it automatically, or
 delete it by hand to force that immediately.
+
+**OBS shows a "Crash Detected" recovery dialog and won't proceed** — this
+is different from the double-launch dialog below; it means OBS's last exit
+wasn't clean (e.g. `Stop-Process -Force`/Task Manager kill/actual crash,
+rather than a normal window close). It blocks all startup, including
+`stream_actions.connect()`'s auto-launch, until "Run in Normal Mode" or
+"Run in Safe Mode" is clicked — nobody's there to click it on an unattended
+boot. If you ever need to close OBS programmatically (e.g. to install a
+plugin), use a graceful close (send `WM_CLOSE` — in PowerShell,
+`(Get-Process obs64).CloseMainWindow()`) rather than force-killing it, to
+avoid triggering this on the next launch. If it does appear, run
+`dismiss_obs_crash_dialog.ps1` to dismiss it without a mouse (uses UI
+Automation's `InvokePattern` on the "Run in Normal Mode" button - plain
+SendKeys doesn't reliably reach this particular Qt dialog).
 
 **OBS shows a stuck "already running" dialog after a boot** — this would
 block every scheduled action silently on an unattended machine (nobody's
@@ -291,10 +312,70 @@ see "Idempotent reconciliation" above. Git version control
 part of this change, with a baseline commit taken before any of the
 refactor.
 
+## Facebook simultaneous streaming (Aitum Multistream) — manual, not automated
+
+As of 2026-07-06, this machine also pushes to Facebook via the **Aitum
+Multistream** OBS plugin (v1.0.8), installed manually into
+`C:\Program Files\obs-studio\obs-plugins\64bit\aitum-multistream.dll` +
+`C:\Program Files\obs-studio\data\obs-plugins\aitum-multistream\` (the
+plugin's alternative `%ProgramData%\obs-studio-plugins\` install path,
+which doesn't require touching the main OBS install directory, was tried
+first but this OBS build does not scan that location — confirmed by its
+absence from the "Loaded Modules" list in the OBS log after installing
+there. Had to drop it directly into the OBS install dir instead, which this
+machine's account can write to without an elevation prompt).
+
+Aitum's own destination config lives at
+`%APPDATA%\obs-studio\plugin_config\aitum-multistream\config.json` — a
+Facebook destination named "Facebook Output" is configured there with
+Meta's **persistent stream key** (obtained once from the Page's Live
+Producer, not created per-session via the Graph API). Because it's a
+persistent key, there's no broadcast-creation step to script the way
+`yt_broadcast.py` does for YouTube — Facebook auto-detects the incoming
+RTMP data and publishes/ends around it.
+
+**Why this isn't wired into `reconcile.py` — no automation hook exists.**
+Before committing this to the unattended Friday schedule, every standard
+OBS automation surface was checked and Aitum Multistream (this version)
+exposes none of them for its per-destination outputs:
+- Starting OBS's core stream via `stream_actions.connect()` +
+  `start_stream()` does **not** cascade-start the Facebook output — it's a
+  genuinely separate `obs_output` object (`aitum_multi_output_Facebook
+  Output` in the log), only startable from Aitum's own dock button, and
+  even then only once the main stream is already active (confirmed: OBS
+  logs `failed to start stream 'Facebook Output' because main was not
+  started` if you try it first).
+- No OBS hotkey is registered for it (`GetHotkeyList` over obs-websocket
+  shows nothing Aitum-related).
+- No obs-websocket vendor request either — `CallVendorRequest` against
+  `aitum-multistream` returns `"No vendor was found by that name"`.
+- **Stopping the main stream does not stop it either.** Confirmed by
+  testing: `stop_stream()` cleanly stopped the YouTube leg, but the TCP
+  connection from `obs64.exe` to Facebook's ingest server stayed
+  `Established` afterward (`Get-NetTCPConnection`). The only way found to
+  reliably kill it was a full OBS process restart (`CloseMainWindow()`,
+  not `Stop-Process -Force` — a hard kill leaves the "crash detected"
+  dialog blocking the next launch, see Troubleshooting), which also tears
+  down the YouTube leg and any recording along with it.
+
+**Current procedure, and the accepted risk:** the YouTube leg stays fully
+owned by `reconcile.py`/the scheduled tasks as before, unchanged. The
+Facebook leg is a manual step — someone needs to click Aitum's dock button
+to start it after the session's automated YouTube start, and click it
+again to stop it when the session ends. If it's left running by mistake,
+there's currently no automatic recovery: it will keep streaming
+indefinitely with no viewer-facing content until someone either clicks
+Aitum's stop button or a full OBS restart is performed. This was a
+deliberate decision (2026-07-06) to keep YouTube's reliability intact
+rather than build automation on a plugin with no control surface for it —
+revisit if Aitum ships a vendor-request API, or if a different multistream
+tool is evaluated instead.
+
 ## Open questions / possible future enhancements
 
 - **Thumbnail upload** — feasible. YouTube's API has `thumbnails().set(videoId=..., media_body=<image file>)`, callable right after a broadcast is created, using the same scope we already have. Needs the channel to have custom thumbnails enabled (requires phone verification, which most channels already have) and a static image file to use each week.
-- **Simultaneous stream to Facebook** — feasible but bigger scope. OBS doesn't natively support multiple simultaneous stream destinations out of the box; would need either a plugin (e.g. `obs-multi-rtmp`) to push a second RTMP output to Facebook alongside YouTube, plus Facebook's own Graph API live-video calls (create/end) mirroring what `yt_broadcast.py` does for YouTube. Not yet implemented. Worth doing as a layer on top of the current setup rather than in parallel with it, now that the reconciliation piece below is in place.
+- **Facebook leg automation** — blocked on Aitum Multistream shipping some control surface (obs-websocket vendor request or hotkey) for starting/stopping individual destinations; this is an open, previously-requested feature on their forum as of this writing, not yet implemented. Revisit after an Aitum update, or evaluate an alternative (e.g. `obs-multi-rtmp`, or scripting Facebook's Graph API live-video create/end calls directly against a plain second RTMP output if OBS ever supports one natively) if this becomes a priority. See "Facebook simultaneous streaming" above for what's already been ruled out.
+- **A "Facebook still connected" safety check** — reconcile.py could, at low cost, check (outside session windows) whether OBS still has an established TCP connection to Facebook's ingest host and log a WARNING if so, even though it can't act on it. Not built — no request for it yet, and a log line nobody reads doesn't add much; would be more useful paired with some kind of alerting (e.g. an email/notification), which is its own separate scope.
 - **Session window times duplicated across two files** — `reconcile.py`'s `SESSION_WINDOWS` and `register_tasks.ps1`'s trigger times encode the same 1:05/2:00/2:05/3:00 schedule independently and must be kept in sync by hand. Could be collapsed into one source of truth (e.g. `register_tasks.ps1` reads the windows from a small JSON/Python config file that `reconcile.py` also imports) if the schedule starts changing often enough for the duplication to bite. Not worth it while the schedule is fixed and rarely touched.
 
 ## Idempotent boot-time reconciliation — implemented 2026-07-06
