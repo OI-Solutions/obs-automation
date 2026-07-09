@@ -46,13 +46,13 @@ Audio Mixer ────────────────────┤
                                 │
         ┌──────────────┬────────┴────────┐
         ▼              ▼                 ▼
-    YouTube      Future Facebook    Future WordPress
+    YouTube      Facebook (manual)   WordPress (future)
         │
         ▼
-   Future AI Processing
+   AI Processing (future)
         │
         ▼
-  Website • Email • Social Media
+  Website • Email • Social Media (future)
 ```
 
 The audio mixer feeds the Automation PC directly (not through the capture
