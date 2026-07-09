@@ -5,16 +5,17 @@
 ## Table of Contents
 
 1. [Project Summary](#project-summary)
-2. [Deliverables Overview](#deliverables-overview)
-3. [Future Roadmap](#future-roadmap)
-4. [System Details](#system-details)
+2. [System Architecture](#system-architecture)
+3. [Deliverables Overview](#deliverables-overview)
+4. [Future Roadmap](#future-roadmap)
+5. [System Details](#system-details)
    1. [Automated Live Streaming & Automation Platform](#1-automated-live-streaming--automation-platform)
    2. [Remote Operations](#2-remote-operations)
    3. [Production Reliability](#3-production-reliability)
    4. [Audio & Video Integration](#4-audio--video-integration)
    5. [Multi-Platform Streaming Integration (Facebook)](#5-multi-platform-streaming-integration-facebook)
-5. [Documentation](#documentation)
-6. [Professional Services](#professional-services)
+6. [Documentation](#documentation)
+7. [Professional Services](#professional-services)
 
 ------------------------------------------------------------------------
 
@@ -30,6 +31,35 @@ This project combined AV integration, systems engineering, software
 development, network administration, cloud services, and custom
 automation into a single production platform designed for long-term
 maintainability and future growth.
+
+------------------------------------------------------------------------
+
+## System Architecture
+
+```
+PTZ Camera ──── Capture Card ──┐
+                                │
+Audio Mixer ────────────────────┤
+                                ▼
+                       Automation PC
+                    (Recording / Streaming)
+                                │
+        ┌──────────────┬────────┴────────┐
+        ▼              ▼                 ▼
+    YouTube      Future Facebook    Future WordPress
+        │
+        ▼
+   Future AI Processing
+        │
+        ▼
+  Website • Email • Social Media
+```
+
+The audio mixer feeds the Automation PC directly (not through the capture
+card) — the capture card carries video only. This keeps the audio and
+video signal paths independent, which is what allows each to be
+upgraded or reconfigured without affecting the other (see Section 4,
+Audio & Video Integration).
 
 ------------------------------------------------------------------------
 
