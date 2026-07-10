@@ -147,13 +147,11 @@ workflow rather than off-the-shelf scheduling software.
 
 ### Architecture
 
-| Component | Purpose |
-|---|---|
-| Stream Control Engine | Broadcast lifecycle management (start/stop of stream and recording), including the manual command-line interface used for testing and one-off actions |
-| Scheduling & Reconciliation Engine | Time-based automation; compares desired vs. actual state and self-heals after any interruption, including unclean shutdowns and stale state |
-| YouTube Integration | Broadcast creation, binding, and lifecycle management via the YouTube Data API |
-| Windows Task Registration | Scheduled execution across all production triggers |
-| Authorization Utilities | Initial YouTube account/OAuth configuration |
+| Component | Purpose | Sub-Components / Technologies |
+|---|---|---|
+| Stream Control Engine | Broadcast lifecycle management (start/stop of stream and recording), including the manual command-line interface used for testing and one-off actions | `stream_actions.py` — OBS control via the `obsws-python` WebSocket client; `obs_stream_ctl.py` — manual CLI wrapper |
+| Scheduling & Reconciliation Engine | Time-based automation; compares desired vs. actual state and self-heals after any interruption, including unclean shutdowns, stale state, and missed/delayed triggers | `reconcile.py` — wall-clock reconciliation logic; `register_tasks.ps1` — Windows Task Scheduler registration; `dismiss_obs_crash_dialog.ps1` — automated recovery from unclean-shutdown dialogs |
+| Multi-Channel Stream Publishing | Automated broadcast creation and lifecycle management on YouTube, plus manually-toggled simultaneous streaming to Facebook | `yt_broadcast.py` + `authorize_youtube.py` — YouTube Data API v3 via Google OAuth (the only authorization step in the system — Facebook requires none, just a static stream key); Aitum Multistream — third-party OBS plugin, Facebook via persistent RTMP key |
 
 ### Engineering Work
 
