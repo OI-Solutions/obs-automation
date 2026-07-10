@@ -22,16 +22,11 @@
 
 ## Project Summary
 
-Designed and deployed a custom media automation platform for AIF,
-transforming a largely manual live production process into a reliable,
-remotely managed system capable of scheduled recording, automated
-streaming to multiple platforms, and future expansion into AI-assisted
-media and communications.
-
-This project combined AV integration, systems engineering, software
-development, network administration, cloud services, and custom
-automation into a single production platform designed for long-term
-maintainability and future growth.
+Replaced AIF's manual live-production workflow with a reliable,
+remotely-managed system: livestreams run automatically, recordings are
+backed up locally, and the same broadcast now reaches both YouTube and
+Facebook. Built to be maintained and extended for years, not just to
+work today.
 
 ------------------------------------------------------------------------
 
