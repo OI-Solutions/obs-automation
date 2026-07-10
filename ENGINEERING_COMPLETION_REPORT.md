@@ -9,11 +9,11 @@
 3. [Deliverables Overview](#deliverables-overview)
 4. [Future Roadmap](#future-roadmap)
 5. [System Details](#system-details)
-   1. [Automated Live Streaming & Automation Platform](#1-automated-live-streaming--automation-platform)
+   1. [Automated Live Streaming](#1-automated-live-streaming)
    2. [Remote Operations](#2-remote-operations)
    3. [Production Reliability](#3-production-reliability)
    4. [Audio & Video Integration](#4-audio--video-integration)
-   5. [Multi-Platform Streaming Integration (Facebook)](#5-multi-platform-streaming-integration-facebook)
+   5. [Facebook Streaming](#5-facebook-streaming)
 6. [Documentation](#documentation)
 7. [Maintenance Recommendations](#maintenance-recommendations)
 8. [Professional Services](#professional-services)
@@ -70,25 +70,13 @@ The following capabilities have been completed and are now operational.
 
 | Capability | Summary | Hours |
 |---|---|---|
-| **Automated Live Streaming & Automation Platform** | Fully automated weekly livestreams, scheduled recording, reliable publishing workflow, minimal operator involvement, built on a purpose-built automation framework designed specifically for AIF's workflow. | **14** |
-| **Remote Operations** | Secure remote administration, access, troubleshooting, and maintenance without requiring on-site access, including a mobile-accessible remote session configured to start automatically on every reboot. | **5** |
-| **Production Reliability** | Recovery from common failures including power outages, software interruptions, and recording issues. | **8** |
-| **Audio & Video Integration** | Redesigned audio/video routing with improved quality, synchronization, and flexibility for future expansion. | **6** |
-| **Multi-Platform Streaming Integration (Facebook)** | Simultaneous streaming to Facebook alongside YouTube, integrated into the existing production workflow. | **4** |
+| **Automated Live Streaming** | Weekly livestreams run start to finish with no manual steps, and the system corrects itself automatically if something goes wrong mid-schedule. | **14** |
+| **Remote Operations** | The system can be accessed, maintained, and fixed remotely — no on-site visit needed for routine work. | **5** |
+| **Production Reliability** | Keeps running through common failures — power outages, software crashes, missed steps — without someone needing to catch and fix it manually. | **8** |
+| **Audio & Video Integration** | Audio and video are handled independently for better quality and easier future upgrades, instead of being tangled together through the camera. | **6** |
+| **Facebook Streaming** | The same broadcast now also streams to Facebook alongside YouTube — turning it on and off each week is currently a manual step. | **4** |
 
 **Total Engineering Time:** **37 Hours**
-
-> **Note on structure:** the previous draft of this report listed
-> "Custom Automation Platform" as a separate deliverable from "Automated
-> Live Streaming." On review, its components (stream control, scheduling/
-> reconciliation, YouTube integration, task registration, recovery
-> utilities, command interface, authorization) are the same underlying
-> code delivering "Automated Live Streaming," described from an
-> architecture angle rather than a separate body of work. They've been
-> combined into one line item here so the same engineering hours aren't
-> represented as two separate deliverables. The original combined hour
-> total (10 + 4 = 14) has been preserved rather than reduced — flag if
-> you'd rather bill this differently.
 
 ------------------------------------------------------------------------
 
@@ -126,7 +114,7 @@ automation.
 
 # System Details
 
-## 1. Automated Live Streaming & Automation Platform
+## 1. Automated Live Streaming
 
 ### Overview
 
@@ -291,7 +279,7 @@ limitations within the camera hardware.
 
 ------------------------------------------------------------------------
 
-## 5. Multi-Platform Streaming Integration (Facebook)
+## 5. Facebook Streaming
 
 ### Overview
 
@@ -361,6 +349,12 @@ Approximately:
 
 # Maintenance Recommendations
 
+- **No automatic recovery from a frozen or blank video signal.** If the
+  camera/capture card signal into OBS ever goes stale (distinct from a
+  stream/broadcast interruption, which is covered), the current fix is
+  manually refreshing the source in OBS — nothing in the automation
+  detects or resolves this on its own. Worth a dedicated check if this
+  has recurred.
 - **Recording storage has no automatic cleanup.** Local recordings
   accumulate indefinitely; at typical session lengths, the current free
   disk space is on the order of several months' runway, not indefinite.
@@ -389,11 +383,11 @@ Approximately:
 
 | Description | Hours |
 |---|---|
-| Automated Live Streaming & Automation Platform | 14 |
+| Automated Live Streaming | 14 |
 | Remote Operations | 5 |
 | Production Reliability | 8 |
 | Audio & Video Integration | 6 |
-| Multi-Platform Streaming Integration (Facebook) | 4 |
+| Facebook Streaming | 4 |
 | **Total Engineering Time** | **37** |
 
 **Engineering Rate:** $50.00/hour
