@@ -155,19 +155,22 @@ workflow rather than off-the-shelf scheduling software.
 
 ### Key Engineering Decisions
 
-- Built an idempotent reconciliation system rather than relying on
-  fixed-time triggers alone, after a real multi-hour power outage showed
-  how blind fixed-time automation can fire a stale action hours late.
-  Verified against 6 scripted failure scenarios plus a live back-to-back
-  two-session test replicating the actual Friday schedule pattern.
-- Diagnosed why the YouTube Data API's channel lookup was silently
-  resolving to the wrong channel — traced to authenticating with a Brand
-  Account Manager login instead of the channel's Owner account, a
-  distinction the API's own documentation doesn't make obvious.
-- Published the OAuth consent screen to Production rather than Testing
-  status specifically to avoid Google's 7-day refresh-token expiry on
-  Testing-tier apps, which would have silently broken the automation
-  every week without warning.
+- Built the YouTube integration on top of the YouTube Data API rather
+  than a plain video stream with nothing managing it — this is what
+  makes it possible to create a real, properly-titled broadcast,
+  transition it live, and cleanly finalize it into its own separate
+  video afterward. Facebook, by contrast, uses a direct stream connection
+  with a fixed key rather than an equivalent managed integration — Meta's
+  stricter requirements for that level of integration made a simpler,
+  more manual approach the practical choice there instead (see Section 5).
+- Added automatic safeguards so that if a session gets interrupted or
+  stalls partway through — a power blip, a missed step, a connection
+  that didn't come back cleanly — the system notices on its own and
+  restores the correct state the next time it checks, rather than
+  staying stuck until someone manually intervenes. This was directly
+  motivated by a real multi-hour power outage that exposed how a simpler
+  fixed-schedule approach could otherwise leave things broken for hours
+  with nobody aware.
 
 **Engineering Time:** **14 hours**
 
@@ -267,6 +270,12 @@ limitations within the camera hardware.
 
 ### Key Engineering Decisions
 
+- Deliberately separated the audio and video signal paths — audio comes
+  directly from the mixer, video from the camera through a capture card
+  — rather than running a physical wire from the camera to the mixer to
+  combine them first. This avoids an extra wire run, gives independent
+  control over each signal, and delivers better quality than routing
+  audio through the camera's own hardware.
 - Identified that the capture card's own embedded audio pin was
   redundantly mixed alongside the mixer's Line In on the same output
   track — a latent source of intermittent audio issues — and removed it
