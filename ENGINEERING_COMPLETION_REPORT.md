@@ -50,7 +50,7 @@ Audio Mixer ────────────────────┤
     YouTube      Facebook (manual)   WordPress (future)
         │
         ▼
-   AI Processing (future)
+  Custom Automation (future)
         │
         ▼
   Website • Email • Social Media (future)
@@ -71,9 +71,9 @@ The following capabilities have been completed and are now operational.
 | Capability | Summary | Hours |
 |---|---|---|
 | **Automated Live Streaming & Automation Platform** | Fully automated weekly livestreams, scheduled recording, reliable publishing workflow, minimal operator involvement, built on a purpose-built automation framework designed specifically for AIF's workflow. | **14** |
-| **Remote Operations** | Secure remote administration, access, troubleshooting, and maintenance without requiring on-site access, including a mobile-accessible remote session available immediately after any reboot. | **5** |
+| **Remote Operations** | Secure remote administration, access, troubleshooting, and maintenance without requiring on-site access, including a mobile-accessible remote session configured to start automatically on every reboot. | **5** |
 | **Production Reliability** | Recovery from common failures including power outages, software interruptions, and recording issues. | **8** |
-| **Audio & Video Integration** | Professional audio/video routing with improved quality, synchronization, and flexibility for future expansion. | **6** |
+| **Audio & Video Integration** | Redesigned audio/video routing with improved quality, synchronization, and flexibility for future expansion. | **6** |
 | **Multi-Platform Streaming Integration (Facebook)** | Simultaneous streaming to Facebook alongside YouTube, integrated into the existing production workflow. | **4** |
 
 **Total Engineering Time:** **37 Hours**
@@ -149,12 +149,10 @@ workflow rather than off-the-shelf scheduling software.
 
 | Component | Purpose |
 |---|---|
-| Stream Control Engine | Broadcast lifecycle management (start/stop of stream and recording) |
-| Scheduling & Reconciliation Engine | Time-based automation; compares desired vs. actual state and self-heals after any interruption |
+| Stream Control Engine | Broadcast lifecycle management (start/stop of stream and recording), including the manual command-line interface used for testing and one-off actions |
+| Scheduling & Reconciliation Engine | Time-based automation; compares desired vs. actual state and self-heals after any interruption, including unclean shutdowns and stale state |
 | YouTube Integration | Broadcast creation, binding, and lifecycle management via the YouTube Data API |
 | Windows Task Registration | Scheduled execution across all production triggers |
-| Recovery Utilities | Automatic handling of unclean shutdowns and stale state |
-| Command Interface | Manual administrative control for testing and one-off actions |
 | Authorization Utilities | Initial YouTube account/OAuth configuration |
 
 ### Engineering Work
@@ -179,9 +177,9 @@ workflow rather than off-the-shelf scheduling software.
 ### Overview
 
 Configured the production system for secure remote administration,
-allowing maintenance, monitoring, updates, and troubleshooting without
-requiring physical access to the building — including a mobile-accessible
-session that's available immediately after any reboot, without needing to
+allowing maintenance, updates, and troubleshooting without requiring
+physical access to the building — including a mobile-accessible session
+configured to start automatically on every reboot, without needing to
 remote in and start one manually first.
 
 ### Workflow
@@ -192,11 +190,14 @@ Administrators can remotely:
   disruptions a standard remote-desktop connection can cause on an
   actively-streaming machine (confirmed by testing; a lower-impact remote
   access method is used specifically to avoid this)
-- Reach a live administrative session from a mobile device, auto-started
-  on every boot
+- Reach a mobile-accessible administrative session that starts
+  automatically on every boot (confirmed working; whether it stays paired
+  to a phone across a real reboot without re-pairing is still being
+  verified — see Maintenance Recommendations)
 - Update configurations, start or stop services when necessary
 - Diagnose hardware and software issues
-- Perform maintenance without interrupting normal operations
+- Perform routine maintenance with minimal interruption to normal
+  operations
 
 ### Engineering Work
 
