@@ -153,18 +153,21 @@ workflow rather than off-the-shelf scheduling software.
 | Scheduling & Reconciliation Engine | Time-based automation; compares desired vs. actual state and self-heals after any interruption, including unclean shutdowns, stale state, and missed/delayed triggers | `reconcile.py` — wall-clock reconciliation logic; `register_tasks.ps1` — Windows Task Scheduler registration; `dismiss_obs_crash_dialog.ps1` — automated recovery from unclean-shutdown dialogs |
 | Multi-Channel Stream Publishing | Automated broadcast creation and lifecycle management on YouTube, plus manually-toggled simultaneous streaming to Facebook | `yt_broadcast.py` + `authorize_youtube.py` — YouTube Data API v3 via Google OAuth (the only authorization step in the system — Facebook requires none, just a static stream key); Aitum Multistream — third-party OBS plugin, Facebook via persistent RTMP key |
 
-### Engineering Work
+### Key Engineering Decisions
 
-- Production workflow design
-- Broadcast automation
-- Scheduling and reconciliation logic
-- Google Cloud project setup and OAuth authentication (production-tier
-  consent screen, avoiding the token-expiry limitations of testing-tier
-  apps; authorized against the channel's owner account specifically, not
-  a manager-only account, after diagnosing why manager credentials
-  resolved to the wrong channel)
-- Recording lifecycle management
-- Extensive production testing, including multiple live end-to-end runs
+- Built an idempotent reconciliation system rather than relying on
+  fixed-time triggers alone, after a real multi-hour power outage showed
+  how blind fixed-time automation can fire a stale action hours late.
+  Verified against 6 scripted failure scenarios plus a live back-to-back
+  two-session test replicating the actual Friday schedule pattern.
+- Diagnosed why the YouTube Data API's channel lookup was silently
+  resolving to the wrong channel — traced to authenticating with a Brand
+  Account Manager login instead of the channel's Owner account, a
+  distinction the API's own documentation doesn't make obvious.
+- Published the OAuth consent screen to Production rather than Testing
+  status specifically to avoid Google's 7-day refresh-token expiry on
+  Testing-tier apps, which would have silently broken the automation
+  every week without warning.
 
 **Engineering Time:** **14 hours**
 
@@ -197,16 +200,17 @@ Administrators can remotely:
 - Perform routine maintenance with minimal interruption to normal
   operations
 
-### Engineering Work
+### Key Engineering Decisions
 
-- Remote access infrastructure and security configuration
-- Evaluation of remote-access methods against this machine's specific
-  audio/video capture setup, to avoid a known failure mode where standard
-  remote desktop connections can disrupt live audio capture
-- Mobile-accessible administrative session, configured to start
-  automatically on every boot with no manual step required
-- Remote administration testing
-- Operational documentation
+- Chose Chrome Remote Desktop over native Windows RDP after direct
+  testing confirmed RDP's session takeover breaks OBS's live audio
+  capture (the mixer input dropped for several minutes during a live
+  test before self-recovering). Chrome Remote Desktop mirrors the
+  existing session instead of taking it over, avoiding this entirely.
+- Resolved the specific blocker preventing an unattended Claude Code
+  session from starting automatically at boot — a one-time workspace
+  trust prompt with no one there to answer it — enabling a
+  mobile-accessible administrative session with no manual startup step.
 
 **Engineering Time:** **5 hours**
 
@@ -225,18 +229,21 @@ The production platform now incorporates multiple layers of recovery and
 fault tolerance designed to continue operating through common failure
 scenarios, including power loss spanning multiple hours.
 
-### Engineering Work
+### Key Engineering Decisions
 
-- Automated startup after power restoration
-- Recovery from software failures
-- Scheduled task management
-- Hardware validation
-- Failure testing, including simulated multi-hour outage scenarios
-- Production hardening
-
-Numerous issues required reverse engineering undocumented behavior
-across several third-party hardware and software components before a
-reliable configuration could be established.
+- Investigated a real production incident where a multi-day power outage
+  caused three missed scheduled triggers to fire in an uncoordinated
+  burst on recovery. Determined this was Windows Task Scheduler's own
+  catch-up behavior rather than a bug in the automation, and confirmed
+  the existing state-checks prevented actual damage (no duplicate
+  broadcasts) despite messy-looking logs from the racing processes.
+- Used that incident to drive the reconciliation redesign (see Section
+  1) that now protects against a repeat, rather than patching the
+  symptom in isolation.
+- Confirmed local recordings use a crash-resilient file format that
+  survives an abrupt interruption — relevant precisely because the
+  failure mode it protects against (power loss mid-recording) is a real,
+  observed scenario for this system, not a theoretical one.
 
 **Engineering Time:** **8 hours**
 
@@ -258,15 +265,18 @@ production feed.
 This design simplifies future upgrades and reduces dependence on
 limitations within the camera hardware.
 
-### Engineering Work
+### Key Engineering Decisions
 
-- Hardware evaluation
-- Capture device integration
-- Audio routing redesign, including identifying and removing a redundant
-  audio path that could intermittently affect stream quality
-- Signal testing
-- Compatibility troubleshooting
-- Production validation
+- Identified that the capture card's own embedded audio pin was
+  redundantly mixed alongside the mixer's Line In on the same output
+  track — a latent source of intermittent audio issues — and removed it
+  via direct OBS control rather than a manual scene-file edit, avoiding
+  the risk of corrupting the scene configuration by hand.
+- Traced a reported "no audio on the live stream" issue back to a mixer
+  routing mistake external to this system, rather than a defect in the
+  automation or OBS configuration, confirmed via a live test after
+  isolating the variable — avoiding an unnecessary and more invasive fix
+  to something that wasn't actually broken.
 
 **Engineering Time:** **6 hours**
 
@@ -292,18 +302,23 @@ into the existing OBS-based workflow.
   performed alongside the otherwise fully automated YouTube schedule (see
   the note under Future Roadmap for why).
 
-### Engineering Work
+### Key Engineering Decisions
 
-- Evaluation of current multistreaming plugin options
-- Plugin installation and configuration
-- Correction of platform-provided connection details to ensure a reliable
-  connection
-- Full backup of existing production configuration prior to making
-  changes, as a safety precaution
-- Live end-to-end testing of the simultaneous dual-platform stream
-- Investigation and documentation of the plugin's automation
-  capabilities and limitations, to accurately scope what can and can't
-  be automated going forward
+- Chose Aitum Multistream over the older `obs-multi-rtmp` plugin based on
+  current community adoption, then verified its actual automation
+  capabilities directly against the running system rather than assuming
+  from its documentation, which doesn't cover this.
+- Corrected a wrong Facebook ingest server URL that Aitum's own built-in
+  preset had auto-filled, in favor of the URL from Facebook's own
+  dashboard for the specific persistent key in use — a reminder that
+  third-party presets can go stale in ways platform-provided values don't.
+- Determined through direct testing that Aitum has no API, hotkey, or
+  scriptable way to start or stop the Facebook output independently of
+  the main stream. This finding directly shaped the decision to keep
+  Facebook as a manual step rather than build fragile automation on a
+  capability that doesn't exist (see Future Roadmap).
+- Took a full backup of the production OBS configuration before making
+  any of these changes, as a precaution.
 
 **Engineering Time:** **4 hours**
 
