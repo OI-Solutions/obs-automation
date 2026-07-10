@@ -15,7 +15,8 @@
    4. [Audio & Video Integration](#4-audio--video-integration)
    5. [Multi-Platform Streaming Integration (Facebook)](#5-multi-platform-streaming-integration-facebook)
 6. [Documentation](#documentation)
-7. [Professional Services](#professional-services)
+7. [Maintenance Recommendations](#maintenance-recommendations)
+8. [Professional Services](#professional-services)
 
 ------------------------------------------------------------------------
 
@@ -314,13 +315,11 @@ into the existing OBS-based workflow.
 Comprehensive documentation has been produced covering:
 
 - System architecture
-- Deployment procedures
-- Hardware configuration
 - Recovery procedures
-- Troubleshooting
+- Troubleshooting (including a full diagnostic history of the audio
+  hardware investigation)
 - Automation scripts
 - Remote access setup and rationale
-- Maintenance recommendations
 - Future expansion
 
 This documentation significantly reduces future maintenance effort by
@@ -329,11 +328,37 @@ during implementation.
 
 Approximately:
 
-- 538 lines of production automation code (streaming automation and
-  remote access combined)
+- 573 lines of production automation code (538 streaming automation +
+  35 remote access)
 - 386 lines of core technical documentation
 - 161 lines of hardware diagnostic documentation
 - 137 lines of remote-access setup documentation
+
+------------------------------------------------------------------------
+
+# Maintenance Recommendations
+
+- **Recording storage has no automatic cleanup.** Local recordings
+  accumulate indefinitely; at typical session lengths, the current free
+  disk space is on the order of several months' runway, not indefinite.
+  Periodically clear old recordings, or add this to a future automation
+  pass.
+- **Facebook streaming is a manual step, not automated.** Whoever runs
+  the Friday session needs to start and stop it alongside the automated
+  YouTube stream. If it's ever left running by mistake, nothing
+  automatically stops it — see System Details, Section 5.
+- **Confirm the Claude Remote Control mobile pairing survives a real
+  reboot.** This was set up and works, but whether it reconnects without
+  re-pairing after a genuine restart hasn't been confirmed against a real
+  reboot yet — worth checking the next time one occurs.
+- **Periodically confirm the YouTube OAuth authorization is still
+  valid** (e.g., after any Google account password change) — the
+  automation depends on it and would otherwise fail silently until
+  someone checks the log.
+- **Physical connections are a recurring failure point.** Several past
+  issues traced back to cabling/routing rather than software (mixer
+  input routing, capture card connections). Worth a periodic visual
+  check, especially after any on-site hardware changes.
 
 ------------------------------------------------------------------------
 
