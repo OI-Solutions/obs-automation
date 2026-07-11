@@ -64,10 +64,10 @@ The following capabilities have been completed and are now operational.
 
 | Capability | Summary | Hours |
 |---|---|---|
-| **Automated Live Streaming** | Weekly livestreams run start to finish with no manual steps, self-correct if something goes wrong mid-schedule, and keep a local recording running independently — so even a dropped internet connection doesn't lose the session. Now also reaches Facebook alongside YouTube. | **16** |
-| **Remote Operations** | The system can be accessed, maintained, and fixed remotely — no on-site visit needed for routine work. | **5** |
-| **Production Reliability** | Keeps running through common failures — power outages, software crashes, missed steps — without someone needing to catch and fix it manually. | **8** |
-| **Audio & Video Integration** | Physical wiring, capture hardware, and signal routing set up so audio and video are handled independently for better quality and easier future upgrades. | **6** |
+| **Automated Live Streaming** | • Runs start to finish automatically, no manual steps<br>• Self-corrects if something goes wrong mid-schedule<br>• Local recording continues even if the internet drops<br>• Also streams to Facebook alongside YouTube | **16** |
+| **Remote Operations** | • Accessed, maintained, and fixed remotely<br>• No on-site visit needed for routine work | **5** |
+| **Production Reliability** | • Recovers automatically from power outages<br>• Recovers automatically from software crashes<br>• No manual intervention needed to catch and fix issues | **8** |
+| **Audio & Video Integration** | • Physical wiring and capture hardware installed<br>• Audio and video signal paths run independently<br>• Better quality, easier future upgrades | **6** |
 
 **Total Engineering Time:** **35 Hours**
 
@@ -90,18 +90,6 @@ automation.
 | Unified communications dashboard | 20–30 hours |
 | System health monitoring and failure alerts (internet, OBS, camera, disk space) | 6–10 hours |
 | Automated recurring configuration backups | 2–4 hours |
-
-> **Removed from this list:** "Facebook Live automation and integration."
-> Facebook streaming itself is now live (see Section 1) — what's not
-> included is a fully hands-free start/stop toggle for it, and that's
-> not currently purchasable engineering time. It's blocked upstream: the
-> third-party plugin driving the Facebook connection (Aitum Multistream)
-> has no API, hotkey, or scriptable control surface for its per-destination
-> outputs as of this writing — confirmed directly by testing, not assumed.
-> Automating it would require that plugin shipping a feature it doesn't
-> have yet, or switching to a different multistream tool entirely. Worth
-> revisiting if either changes, but shouldn't be offered as a standard
-> line item today.
 
 ------------------------------------------------------------------------
 
