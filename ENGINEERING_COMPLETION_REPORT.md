@@ -43,14 +43,12 @@ Audio Mixer ────────────────────┤
               ▼                                     ▼
       YouTube Data API                     Facebook (manual)
               │
-              ▼
-          YouTube
-              │
-              ▼
-    Custom Automation (future)
-              │
-              ▼
-  WordPress • Email • Social Media (future)
+      ┌───────┴───────┐
+      ▼               ▼
+  YouTube      Custom Automation (future)
+                       │
+                       ▼
+       WordPress • Email • Social Media (future)
 ```
 
 The audio mixer feeds the Automation PC directly (not through the capture
