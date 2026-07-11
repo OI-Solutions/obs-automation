@@ -41,7 +41,10 @@ Audio Mixer ────────────────────┤
                                 │
         ┌──────────────┬────────┴────────┐
         ▼              ▼                 ▼
-    YouTube      Facebook (manual)   WordPress (future)
+YouTube Data API  Facebook (manual)  WordPress (future)
+        │
+        ▼
+    YouTube
         │
         ▼
   Custom Automation (future)
@@ -64,9 +67,9 @@ The following capabilities have been completed and are now operational.
 
 | Capability | Summary | Hours |
 |---|---|---|
-| **Automated Live Streaming** | • Runs start to finish automatically, no manual steps<br>• Self-corrects if something goes wrong mid-schedule<br>• Local recording continues even if the internet drops<br>• Also streams to Facebook alongside YouTube | **16** |
-| **Remote Operations** | • Accessed, maintained, and fixed remotely<br>• No on-site visit needed for routine work | **5** |
-| **Production Reliability** | • Recovers automatically from power outages<br>• Recovers automatically from software crashes<br>• No manual intervention needed to catch and fix issues | **8** |
+| **Automated Live Streaming** | • Runs start to finish automatically, no manual steps<br>• Multiple sessions can be scheduled in advance — currently two every Friday (1:05–2:00 PM and 2:05–3:00 PM)<br>• Self-corrects if something goes wrong mid-schedule<br>• Local recording continues even if the internet drops<br>• Also streams to Facebook alongside YouTube | **16** |
+| **Remote Operations** | • The machine itself, plus every scheduled trigger and automation, can be accessed and reconfigured remotely<br>• No on-site visit needed for routine work or schedule changes | **5** |
+| **Production Reliability** | • At any moment, the system checks the current time and makes sure the right thing is happening — started, stopped, or already correctly running — even if something was interrupted beforehand<br>• Recovers automatically from power outages<br>• Recovers automatically from software crashes<br>• No manual intervention needed to catch and fix issues | **8** |
 | **Audio & Video Integration** | • Physical wiring and capture hardware installed<br>• Audio and video signal paths run independently<br>• Better quality, easier future upgrades | **6** |
 
 **Total Engineering Time:** **35 Hours**
@@ -80,16 +83,12 @@ automation.
 
 | Enhancement | Estimated Time |
 |---|---|
-| Automatic website publishing for new livestreams and recordings | 3–5 hours |
-| Automatic email and social media announcements | 4–8 hours |
-| Event management automation (single announcement to all communication channels) | 8–12 hours |
+| Automatic WordPress publishing when a new livestream or recording is posted (via the YouTube Data API), with pre-set tags and categories | 3–5 hours |
 | AI-generated video summaries and transcripts | 6–10 hours |
+| System health monitoring and automated recurring configuration backups | 8–14 hours |
 | Automatic highlight clip generation | 10–20 hours |
 | Searchable lecture archive | 12–20 hours |
-| AI assistant for media management and communications | 20–40 hours |
-| Unified communications dashboard | 20–30 hours |
-| System health monitoring and failure alerts (internet, OBS, camera, disk space) | 6–10 hours |
-| Automated recurring configuration backups | 2–4 hours |
+| Unified Communications Hub — one central place to post an announcement, automatically distributed to email, social media, and other channels | 32–50 hours |
 
 ------------------------------------------------------------------------
 
