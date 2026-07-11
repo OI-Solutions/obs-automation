@@ -7,7 +7,7 @@
 1. [Project Summary](#project-summary)
 2. [System Architecture](#system-architecture)
 3. [Deliverables Overview](#deliverables-overview)
-4. [Future Roadmap](#future-roadmap)
+4. [Potential Future Expansions](#potential-future-expansions)
 5. [System Details](#system-details)
    1. [Automated Live Streaming](#1-automated-live-streaming)
    2. [Remote Operations](#2-remote-operations)
@@ -48,7 +48,7 @@ Audio Mixer ────────────────────┤
   YouTube      Custom Automation (future)
                        │
                        ▼
-       WordPress • Email • Social Media (future)
+  WordPress Website • Email • Social Media (future)
 ```
 
 The audio mixer feeds the Automation PC directly (not through the capture
@@ -74,18 +74,16 @@ The following capabilities have been completed and are now operational.
 
 ------------------------------------------------------------------------
 
-# Future Roadmap
+# Potential Future Expansions
 
 The platform was intentionally designed as a foundation for additional
 automation.
 
 | Enhancement | Estimated Time |
 |---|---|
-| Automatic WordPress publishing when a new livestream or recording is posted (via the YouTube Data API), with pre-set tags and categories | 3–5 hours |
-| AI-generated video summaries and transcripts | 6–10 hours |
+| Automatic website and social media publishing when a new livestream or recording is posted (via the YouTube Data API), with pre-set tags and categories | 3–5 hours |
 | System health monitoring and automated recurring configuration backups | 8–14 hours |
-| Automatic highlight clip generation | 10–20 hours |
-| Searchable lecture archive | 12–20 hours |
+| Advanced Content Creation & Management — AI-generated video summaries and transcripts, automatic highlight clip generation, and a searchable lecture archive | 28–50 hours |
 | Unified Communications Hub — one central place to post an announcement, automatically distributed to email, social media, and other channels | 32–50 hours |
 
 ------------------------------------------------------------------------
@@ -148,7 +146,7 @@ Engineering Decisions below).
   documentation doesn't cover this) that it has no API or hotkey to
   start/stop that destination independently — the finding that keeps
   Facebook a manual step today rather than fragile automation built on a
-  capability that doesn't exist (see Future Roadmap).
+  capability that doesn't exist (see Potential Future Expansions).
 
 **Engineering Time:** **16 hours**
 
