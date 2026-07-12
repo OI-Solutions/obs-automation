@@ -158,9 +158,7 @@ Engineering Decisions below).
 
 Configured the production system for secure remote administration,
 allowing maintenance, updates, and troubleshooting without requiring
-physical access to the building — including a mobile-accessible session
-configured to start automatically on every reboot, without needing to
-remote in and start one manually first.
+physical access to the building.
 
 ### Workflow
 
@@ -170,10 +168,6 @@ Administrators can remotely:
   disruptions a standard remote-desktop connection can cause on an
   actively-streaming machine (confirmed by testing; a lower-impact remote
   access method is used specifically to avoid this)
-- Reach a mobile-accessible administrative session that starts
-  automatically on every boot (confirmed working; whether it stays paired
-  to a phone across a real reboot without re-pairing is still being
-  verified — see Maintenance Recommendations)
 - Update configurations, start or stop services when necessary
 - Diagnose hardware and software issues
 - Perform routine maintenance with minimal interruption to normal
@@ -184,9 +178,6 @@ Administrators can remotely:
 - Chose Chrome Remote Desktop over native RDP after testing confirmed
   RDP's session takeover breaks OBS's live audio capture; Chrome Remote
   Desktop mirrors the session instead of taking it over.
-- Resolved the one-time workspace-trust prompt that would otherwise
-  block an unattended session from starting at boot, enabling a
-  mobile-accessible session with no manual startup step.
 
 ### Future / Recommended Expansions
 
@@ -194,6 +185,9 @@ Administrators can remotely:
   glance instead of connecting in to look.
 - Support additional remote users or devices if more than one person
   needs administrative access.
+- Add a local LLM for ongoing system maintenance, monitoring, and admin
+  tasks — self-hosted infrastructure the system owns outright, rather
+  than depending on any individual's personal account.
 
 **Engineering Time:** **5 hours**
 
@@ -232,6 +226,9 @@ scenarios, including power loss spanning multiple hours.
   management.
 - Add proactive failure alerts instead of relying on log review after
   the fact.
+- Wire the PC with Ethernet and add a UPS, so a WiFi drop or power
+  interruption is less likely to happen in the first place, rather than
+  only recovering after the fact.
 
 **Engineering Time:** **8 hours**
 
@@ -276,6 +273,8 @@ limitations within the camera hardware.
 - Upgraded capture or audio hardware if higher resolution or quality is
   ever needed.
 - Wireless audio options to reduce physical cabling further.
+- Organize and label on-site cabling — currently a tangle that makes
+  future troubleshooting and changes harder than necessary.
 
 **Engineering Time:** **6 hours**
 
@@ -324,10 +323,6 @@ Approximately:
   the Friday session needs to start and stop it alongside the automated
   YouTube stream. If it's ever left running by mistake, nothing
   automatically stops it — see System Details, Section 1.
-- **Confirm the Claude Remote Control mobile pairing survives a real
-  reboot.** This was set up and works, but whether it reconnects without
-  re-pairing after a genuine restart hasn't been confirmed against a real
-  reboot yet — worth checking the next time one occurs.
 - **Periodically confirm the YouTube OAuth authorization is still
   valid** (e.g., after any Google account password change) — the
   automation depends on it and would otherwise fail silently until
