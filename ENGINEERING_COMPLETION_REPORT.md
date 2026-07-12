@@ -125,28 +125,28 @@ Engineering Decisions below).
 
 ### Key Engineering Decisions
 
-- Built the YouTube integration on top of the YouTube Data API rather
-  than a plain video stream with nothing managing it — this is what
-  makes it possible to create a real, properly-titled broadcast,
-  transition it live, and cleanly finalize it into its own separate
-  video afterward. Facebook, by contrast, uses a direct stream connection
-  with a fixed key rather than an equivalent managed integration — Meta's
-  stricter requirements for that level of integration made a simpler,
-  more manual approach the practical choice there instead.
-- Added automatic safeguards so that if a session gets interrupted or
-  stalls partway through — a power blip, a missed step, a connection
-  that didn't come back cleanly — the system notices on its own and
-  restores the correct state the next time it checks, rather than
-  staying stuck until someone manually intervenes. This was directly
-  motivated by a real multi-hour power outage that exposed how a simpler
-  fixed-schedule approach could otherwise leave things broken for hours
-  with nobody aware.
-- Added Facebook as a second, simultaneous destination via a
-  multistreaming plugin, then verified through direct testing (its
-  documentation doesn't cover this) that it has no API or hotkey to
-  start/stop that destination independently — the finding that keeps
-  Facebook a manual step today rather than fragile automation built on a
-  capability that doesn't exist (see Potential Future Expansions).
+- Built YouTube on the Data API rather than a plain video stream, so
+  broadcasts are properly created, titled, and finalized — not just raw
+  video with nothing managing it. Facebook uses a simpler direct
+  connection instead, since Meta's stricter requirements didn't justify
+  the same approach there.
+- Added self-correcting safeguards so an interrupted or stalled session
+  recovers automatically instead of staying stuck — motivated by a real
+  multi-hour power outage that exposed the risk of a simpler
+  fixed-schedule approach.
+- Added Facebook as a second destination via a multistreaming plugin,
+  then confirmed through testing that it has no API to start/stop
+  independently — why it's a manual step today rather than automation
+  built on a capability that doesn't exist.
+
+### Future / Recommended Expansions
+
+- Automate the Facebook toggle if the streaming plugin ever adds
+  programmatic control (see Potential Future Expansions).
+- Support one-off or special-event sessions without manual schedule
+  changes.
+- Extend the same publishing pattern to additional platforms beyond
+  YouTube and Facebook as needed.
 
 **Engineering Time:** **16 hours**
 
@@ -181,15 +181,19 @@ Administrators can remotely:
 
 ### Key Engineering Decisions
 
-- Chose Chrome Remote Desktop over native Windows RDP after direct
-  testing confirmed RDP's session takeover breaks OBS's live audio
-  capture (the mixer input dropped for several minutes during a live
-  test before self-recovering). Chrome Remote Desktop mirrors the
-  existing session instead of taking it over, avoiding this entirely.
-- Resolved the specific blocker preventing an unattended Claude Code
-  session from starting automatically at boot — a one-time workspace
-  trust prompt with no one there to answer it — enabling a
-  mobile-accessible administrative session with no manual startup step.
+- Chose Chrome Remote Desktop over native RDP after testing confirmed
+  RDP's session takeover breaks OBS's live audio capture; Chrome Remote
+  Desktop mirrors the session instead of taking it over.
+- Resolved the one-time workspace-trust prompt that would otherwise
+  block an unattended session from starting at boot, enabling a
+  mobile-accessible session with no manual startup step.
+
+### Future / Recommended Expansions
+
+- Add a remote status dashboard so system health can be checked at a
+  glance instead of connecting in to look.
+- Support additional remote users or devices if more than one person
+  needs administrative access.
 
 **Engineering Time:** **5 hours**
 
@@ -210,19 +214,24 @@ scenarios, including power loss spanning multiple hours.
 
 ### Key Engineering Decisions
 
-- Investigated a real production incident where a multi-day power outage
-  caused three missed scheduled triggers to fire in an uncoordinated
-  burst on recovery. Determined this was Windows Task Scheduler's own
-  catch-up behavior rather than a bug in the automation, and confirmed
-  the existing state-checks prevented actual damage (no duplicate
-  broadcasts) despite messy-looking logs from the racing processes.
+- Investigated a real multi-day power outage that caused three missed
+  triggers to fire in a burst on recovery — traced to Windows Task
+  Scheduler's own catch-up behavior, not a bug, and confirmed no actual
+  damage occurred despite messy-looking logs.
 - Used that incident to drive the reconciliation redesign (see Section
-  1) that now protects against a repeat, rather than patching the
-  symptom in isolation.
-- Confirmed local recordings use a crash-resilient file format that
-  survives an abrupt interruption — relevant precisely because the
-  failure mode it protects against (power loss mid-recording) is a real,
-  observed scenario for this system, not a theoretical one.
+  1), fixing the root cause rather than the symptom.
+- Confirmed local recordings use a crash-resilient format that survives
+  an abrupt interruption — relevant since power loss mid-recording is a
+  real, observed scenario here, not theoretical.
+
+### Future / Recommended Expansions
+
+- Add automatic recovery for a frozen or blank video signal (currently
+  requires a manual refresh — see Maintenance Recommendations).
+- Add automated recording cleanup so storage doesn't require manual
+  management.
+- Add proactive failure alerts instead of relying on log review after
+  the fact.
 
 **Engineering Time:** **8 hours**
 
@@ -249,22 +258,24 @@ limitations within the camera hardware.
 
 ### Key Engineering Decisions
 
-- Deliberately separated the audio and video signal paths — audio comes
-  directly from the mixer, video from the camera through a capture card
-  — rather than running a physical wire from the camera to the mixer to
-  combine them first. This avoids an extra wire run, gives independent
-  control over each signal, and delivers better quality than routing
-  audio through the camera's own hardware.
-- Identified that the capture card's own embedded audio pin was
-  redundantly mixed alongside the mixer's Line In on the same output
-  track — a latent source of intermittent audio issues — and removed it
-  via direct OBS control rather than a manual scene-file edit, avoiding
-  the risk of corrupting the scene configuration by hand.
-- Traced a reported "no audio on the live stream" issue back to a mixer
-  routing mistake external to this system, rather than a defect in the
-  automation or OBS configuration, confirmed via a live test after
-  isolating the variable — avoiding an unnecessary and more invasive fix
-  to something that wasn't actually broken.
+- Separated audio and video signal paths — audio direct from the mixer,
+  video via capture card — rather than wiring the camera through the
+  mixer first, avoiding an extra wire run and giving better quality and
+  independent control over each signal.
+- Identified the capture card's own audio pin was redundantly mixed
+  alongside the mixer's Line In — a latent source of intermittent
+  issues — and removed it via direct OBS control rather than risking a
+  manual scene-file edit.
+- Traced a reported "no audio on the stream" issue to an external mixer
+  routing mistake, not a system defect — confirmed via live test,
+  avoiding an unnecessary fix to something that wasn't broken.
+
+### Future / Recommended Expansions
+
+- Additional camera angles or multi-camera switching.
+- Upgraded capture or audio hardware if higher resolution or quality is
+  ever needed.
+- Wireless audio options to reduce physical cabling further.
 
 **Engineering Time:** **6 hours**
 
