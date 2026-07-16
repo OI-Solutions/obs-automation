@@ -15,7 +15,7 @@
    4. [Audio & Video Integration](#4-audio--video-integration)
 6. [Documentation](#documentation)
 7. [Maintenance Recommendations](#maintenance-recommendations)
-8. [Professional Services](#professional-services)
+8. [Professional Services — Invoice Summary](#professional-services--invoice-summary)
 
 ------------------------------------------------------------------------
 
@@ -334,7 +334,7 @@ Approximately:
 
 ------------------------------------------------------------------------
 
-# Professional Services
+# Professional Services — Invoice Summary
 
 | Description | Hours |
 |---|---|
