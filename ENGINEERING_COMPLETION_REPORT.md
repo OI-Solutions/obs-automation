@@ -344,7 +344,7 @@ Approximately:
 | Audio & Video Integration | 6 |
 | **Total Engineering Time** | **35** |
 
-**Engineering Rate:** $50.00/hour
+**Minimum Engineering Rate:** $50.00/hour
 
 **Project Total:** **$1,750**
 
