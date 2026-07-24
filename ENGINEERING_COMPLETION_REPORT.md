@@ -347,3 +347,9 @@ Approximately:
 **Engineering Rate:** $50.00/hour
 
 **Project Total:** **$1,750**
+
+This covers the system as delivered, including ongoing troubleshooting
+and maintenance of what's described in this report. Upgrades, new
+features, or additional automation beyond this scope — including the
+items listed under Potential Future Expansions — would be billed
+separately.
