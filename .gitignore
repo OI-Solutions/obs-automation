@@ -5,5 +5,4 @@ current_broadcast.json
 reconcile.lock
 token.json
 client_secret.json
-*.pdf
 _report_render.html
